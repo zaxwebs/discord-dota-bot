@@ -95,7 +95,8 @@ Serving 1 server(s)
 | `/topheroes role:Carry`        | Shows the top 5 heroes for a specific role       |
 | `/topheroes role:Mid count:10` | Shows the top 10 heroes for a specific role      |
 | `/hero name:Pudge`             | Look up a hero — stats, attributes, roles, win rate |
-| `/misc movies`                 | Get 5 random top movie recommendations (now playing) |
+| `/movies`                      | Get 5 random top movie recommendations (now playing) |
+| `/coinflip`                    | Flip a coin (Heads or Tails)                     |
 | `/help`                        | Show all available commands                       |
 
 ---
