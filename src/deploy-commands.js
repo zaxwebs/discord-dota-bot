@@ -55,6 +55,16 @@ const commands = [
         .setName('coinflip')
         .setDescription('Flip a coin (Heads or Tails)')
         .toJSON(),
+    new SlashCommandBuilder()
+        .setName('ask')
+        .setDescription('Ask a Dota 2 question (AI-powered)')
+        .addStringOption(option =>
+            option
+                .setName('question')
+                .setDescription('Your Dota 2 question (e.g. "When should I pick Anti-Mage?")')
+                .setRequired(true)
+        )
+        .toJSON(),
 ];
 
 const rest = new REST({ version: '10' }).setToken(token);

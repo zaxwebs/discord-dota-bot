@@ -1,8 +1,8 @@
 # Discord Dota 2 Hero Bot
 
-A Discord bot that shows the **top Dota 2 heroes by role** (ranked by win rate).
+A Discord bot that shows the **top Dota 2 heroes by role** (ranked by win rate) and provides **AI-powered Dota 2 Q&A** with organic match analysis.
 
-Use the `/topheroes` slash command to see the best picks for any role — Carry, Mid, Offlane, Support, and more.
+Use the `/topheroes` slash command to see the best picks for any role — Carry, Mid, Offlane, Support, and more. Use `/ask` to ask any meta question or get summaries of specific matches!
 
 ---
 
@@ -54,6 +54,7 @@ DISCORD_TOKEN=paste_your_bot_token_here
 CLIENT_ID=paste_your_application_id_here
 
 TMDB_API_KEY=paste_your_tmdb_api_key_here
+OPENAI_API_KEY=paste_your_openai_api_key_here
 ```
 
 | Variable         | What It Is                                         | Where to Find It                                                              |
@@ -61,6 +62,7 @@ TMDB_API_KEY=paste_your_tmdb_api_key_here
 | `DISCORD_TOKEN`  | The secret token that lets your bot log in          | [Developer Portal](https://discord.com/developers/applications) → Bot → Token |
 | `CLIENT_ID`      | The unique ID of your Discord application (bot)     | [Developer Portal](https://discord.com/developers/applications) → General Information → Application ID |
 | `TMDB_API_KEY`   | API key for movie recommendations                  | [TMDB Settings](https://www.themoviedb.org/settings/api) → Request an API Key (free) |
+| `OPENAI_API_KEY` | API key for AI-powered `/ask` feature              | [OpenAI](https://platform.openai.com/api-keys) → Create new secret key |
 
 
 
@@ -95,6 +97,7 @@ Serving 1 server(s)
 | `/topheroes role:Carry`        | Shows the top 5 heroes for a specific role       |
 | `/topheroes role:Mid count:10` | Shows the top 10 heroes for a specific role      |
 | `/hero name:Pudge`             | Look up a hero — stats, attributes, roles, win rate |
+| `/ask question:`               | Ask a Dota 2 question or prompt a match ID analysis (AI-powered)|
 | `/movies`                      | Get 5 random top movie recommendations (now playing) |
 | `/coinflip`                    | Flip a coin (Heads or Tails)                     |
 | `/help`                        | Show all available commands                       |
@@ -111,7 +114,8 @@ discord-dota/
 │   ├── heroes.js           # Fetches & filters hero data
 │   ├── movies.js           # TMDB API for movie recommendations
 │   ├── embeds.js           # Builds rich embed messages
-│   └── api.js              # OpenDota API helper
+│   ├── api.js              # OpenDota API helper
+│   └── ask.js              # GPT-4o-mini powered Q&A system
 ├── .env                    # Your secrets (not committed)
 ├── .env.example            # Template for .env
 └── package.json

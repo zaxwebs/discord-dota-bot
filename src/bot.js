@@ -5,10 +5,12 @@ import { Client, GatewayIntentBits, Events, EmbedBuilder } from 'discord.js';
 import { getTopHeroesByRole, getAllRolesTop, ROLES, lookupHero } from './heroes.js';
 import { buildRoleEmbed, buildOverviewEmbeds, buildMoviesEmbed, buildHeroEmbed } from './embeds.js';
 import { getRandomTopMovies } from './movies.js';
+import { askDota } from './ask.js';
 
 const COMMANDS_INFO = [
     { name: '/topheroes', description: 'Show the top Dota 2 heroes by role (win rate)' },
     { name: '/hero', description: 'Look up a Dota 2 hero by name' },
+    { name: '/ask', description: 'Ask a Dota 2 question (AI-powered)' },
     { name: '/movies', description: 'Get 5 random top movie recommendations (now playing)' },
     { name: '/coinflip', description: 'Flip a coin (Heads or Tails)' },
     { name: '/help', description: 'Show all available commands' },
@@ -36,6 +38,11 @@ process.on('unhandledRejection', (error) => {
     console.error('Unhandled promise rejection:', error);
 });
 
+// Explicitly handle client errors so the process doesn't exit for network issues
+client.on(Events.Error, (error) => {
+    console.error('Discord client error:', error);
+});
+
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -43,10 +50,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const role = interaction.options.getString('role');
         const count = interaction.options.getInteger('count') ?? 5;
 
-        // Defer reply since API call may take a moment
-        await interaction.deferReply();
-
         try {
+            // Defer reply since API call may take a moment
+            await interaction.deferReply();
+
             if (role) {
                 // Single role
                 const heroes = await getTopHeroesByRole(role, count);
@@ -68,17 +75,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
             }
         } catch (error) {
             console.error('Error handling /topheroes:', error);
-            await interaction.editReply({
-                content: '❌ Failed to fetch hero data. Please try again later.',
-            });
+            const content = '❌ Failed to fetch hero data. Please try again later.';
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ content }).catch(console.error);
+            } else {
+                await interaction.reply({ content, ephemeral: true }).catch(console.error);
+            }
         }
     }
 
     if (interaction.commandName === 'hero') {
         const name = interaction.options.getString('name');
-        await interaction.deferReply();
-
         try {
+            await interaction.deferReply();
             const hero = await lookupHero(name);
 
             if (!hero) {
@@ -90,43 +99,80 @@ client.on(Events.InteractionCreate, async (interaction) => {
             await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             console.error('Error handling /hero:', error);
-            await interaction.editReply({
-                content: '❌ Failed to fetch hero data. Please try again later.',
-            });
+            const content = '❌ Failed to fetch hero data. Please try again later.';
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ content }).catch(console.error);
+            } else {
+                await interaction.reply({ content, ephemeral: true }).catch(console.error);
+            }
         }
     }
 
     if (interaction.commandName === 'movies') {
-        await interaction.deferReply();
-
         try {
+            await interaction.deferReply();
             const movies = await getRandomTopMovies(5);
             const embed = buildMoviesEmbed(movies);
             await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             console.error('Error handling /movies:', error);
-            await interaction.editReply({
-                content: '❌ Failed to fetch movie data. Make sure TMDB_API_KEY is set in .env.',
-            });
+            const content = '❌ Failed to fetch movie data. Make sure TMDB_API_KEY is set in .env.';
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ content }).catch(console.error);
+            } else {
+                await interaction.reply({ content, ephemeral: true }).catch(console.error);
+            }
+        }
+    }
+
+    if (interaction.commandName === 'ask') {
+        const question = interaction.options.getString('question');
+        try {
+            await interaction.deferReply();
+            const answer = await askDota(question);
+
+            const embed = new EmbedBuilder()
+                .setTitle('🤖 Dota 2 AI')
+                .setDescription(`**❓ Question:**\n${question}\n\n**💡 Answer:**\n${answer.slice(0, 4000)}`)
+                .setColor(0x10A37F)
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [embed] });
+        } catch (error) {
+            console.error('Error handling /ask:', error);
+            const content = '❌ Failed to get an answer. Please try again later.';
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ content }).catch(console.error);
+            } else {
+                await interaction.reply({ content, ephemeral: true }).catch(console.error);
+            }
         }
     }
 
 
     if (interaction.commandName === 'coinflip') {
-        const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
-        const emoji = result === 'Heads' ? '🪙' : '🦅';
-        await interaction.reply(`${emoji} **${result}**!`);
+        try {
+            const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
+            const emoji = result === 'Heads' ? '🪙' : '🦅';
+            await interaction.reply(`${emoji} **${result}**!`);
+        } catch (error) {
+            console.error('Error handling /coinflip:', error);
+        }
     }
 
     if (interaction.commandName === 'help') {
-        const list = COMMANDS_INFO.map(c => `**${c.name}** — ${c.description}`).join('\n');
+        try {
+            const list = COMMANDS_INFO.map(c => `**${c.name}** — ${c.description}`).join('\n');
 
-        const embed = new EmbedBuilder()
-            .setTitle('Available Commands')
-            .setDescription(list)
-            .setColor(0x2196F3);
+            const embed = new EmbedBuilder()
+                .setTitle('Available Commands')
+                .setDescription(list)
+                .setColor(0x2196F3);
 
-        await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error('Error handling /help:', error);
+        }
     }
 });
 
