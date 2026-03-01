@@ -65,6 +65,16 @@ const commands = [
                 .setRequired(true)
         )
         .toJSON(),
+    new SlashCommandBuilder()
+        .setName('investigate')
+        .setDescription('Deep research a complex Dota 2 question using recent web data')
+        .addStringOption(option =>
+            option
+                .setName('question')
+                .setDescription('Your question (e.g. "What are the biggest changes in the latest patch?")')
+                .setRequired(true)
+        )
+        .toJSON(),
 ];
 
 const rest = new REST({ version: '10' }).setToken(token);

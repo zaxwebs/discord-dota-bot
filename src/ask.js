@@ -2,6 +2,7 @@
 
 import OpenAI from 'openai';
 import { fetchMatchSummary } from './api.js';
+import { calculateCost } from './logger.js';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -82,8 +83,22 @@ export async function askDota(question) {
             max_tokens: 1024,
         });
 
-        return secondResponse.choices[0].message.content;
+        const totalInput = (response.usage?.prompt_tokens || 0) + (secondResponse.usage?.prompt_tokens || 0);
+        const totalOutput = (response.usage?.completion_tokens || 0) + (secondResponse.usage?.completion_tokens || 0);
+
+        return {
+            answer: secondResponse.choices[0].message.content,
+            tokens: totalInput + totalOutput,
+            cost: calculateCost('gpt-4o-mini', totalInput, totalOutput)
+        };
     }
 
-    return responseMessage.content;
+    const inputTokens = response.usage?.prompt_tokens || 0;
+    const outputTokens = response.usage?.completion_tokens || 0;
+
+    return {
+        answer: responseMessage.content,
+        tokens: inputTokens + outputTokens,
+        cost: calculateCost('gpt-4o-mini', inputTokens, outputTokens)
+    };
 }
