@@ -1,8 +1,22 @@
-# Discord Dota 2 Hero Bot
+# 🛡️ Dota 2 AI Discord Bot
 
-A Discord bot that shows the **top Dota 2 heroes by role** (ranked by win rate) and provides **AI-powered Dota 2 Q&A** with organic match analysis.
+A Dota 2 companion for Discord! This bot provides real-time stats on the **top Dota 2 heroes by role** and features an **AI-powered Q&A engine** to analyze matches, meta trends, and deep-dive into complex game mechanics.
 
-Use the `/topheroes` slash command to see the best picks for any role — Carry, Mid, Offlane, Support, and more. Use `/ask` to ask any meta question or get summaries of specific matches!
+---
+
+## Usage
+
+| Command                        | Description                                      |
+| ------------------------------ | ------------------------------------------------ |
+| `/topheroes`                   | Shows the top 5 heroes for **every** role        |
+| `/topheroes role:Carry`        | Shows the top 5 heroes for a specific role       |
+| `/topheroes role:Mid count:10` | Shows the top 10 heroes for a specific role      |
+| `/hero name:Pudge`             | Look up a hero — stats, attributes, roles, win rate |
+| `/ask question:`               | Ask a Dota 2 question or prompt a match ID analysis (AI-powered)|
+| `/investigate question:`       | Deep research a complex Dota 2 question using recent web data |
+| `/movies`                      | Get 5 random top movie recommendations (now playing) |
+| `/coinflip`                    | Flip a coin (Heads or Tails)                     |
+| `/help`                        | Show all available commands                       |
 
 ---
 
@@ -89,21 +103,6 @@ Serving 1 server(s)
 
 ---
 
-## Usage
-
-| Command                        | Description                                      |
-| ------------------------------ | ------------------------------------------------ |
-| `/topheroes`                   | Shows the top 5 heroes for **every** role        |
-| `/topheroes role:Carry`        | Shows the top 5 heroes for a specific role       |
-| `/topheroes role:Mid count:10` | Shows the top 10 heroes for a specific role      |
-| `/hero name:Pudge`             | Look up a hero — stats, attributes, roles, win rate |
-| `/ask question:`               | Ask a Dota 2 question or prompt a match ID analysis (AI-powered)|
-| `/movies`                      | Get 5 random top movie recommendations (now playing) |
-| `/coinflip`                    | Flip a coin (Heads or Tails)                     |
-| `/help`                        | Show all available commands                       |
-
----
-
 ## Project Structure
 
 ```
@@ -115,7 +114,9 @@ discord-dota/
 │   ├── movies.js           # TMDB API for movie recommendations
 │   ├── embeds.js           # Builds rich embed messages
 │   ├── api.js              # OpenDota API helper
-│   └── ask.js              # GPT-4o-mini powered Q&A system
+│   ├── ask.js              # GPT-4o-mini powered Q&A system
+│   ├── logger.js           # Morgan-based logging for bot interactions
+│   └── investigate.js      # Deep research a complex Dota 2 question using recent web data
 ├── .env                    # Your secrets (not committed)
 ├── .env.example            # Template for .env
 └── package.json
