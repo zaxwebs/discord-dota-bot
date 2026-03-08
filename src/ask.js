@@ -2,7 +2,6 @@
 
 import OpenAI from 'openai';
 import { fetchMatchSummary } from './api.js';
-import { calculateCost } from './logger.js';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -88,8 +87,7 @@ export async function askDota(question) {
 
         return {
             answer: secondResponse.choices[0].message.content,
-            tokens: totalInput + totalOutput,
-            cost: calculateCost('gpt-4o-mini', totalInput, totalOutput)
+            tokens: totalInput + totalOutput
         };
     }
 
@@ -98,7 +96,6 @@ export async function askDota(question) {
 
     return {
         answer: responseMessage.content,
-        tokens: inputTokens + outputTokens,
-        cost: calculateCost('gpt-4o-mini', inputTokens, outputTokens)
+        tokens: inputTokens + outputTokens
     };
 }

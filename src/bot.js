@@ -5,9 +5,17 @@ import { Client, GatewayIntentBits, Events, EmbedBuilder } from 'discord.js';
 import { getTopHeroesByRole, getAllRolesTop, ROLES, lookupHero } from './heroes.js';
 import { buildRoleEmbed, buildOverviewEmbeds, buildMoviesEmbed, buildHeroEmbed } from './embeds.js';
 import { getRandomTopMovies } from './movies.js';
+import { readdirSync } from 'fs';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import { askDota } from './ask.js';
 import { investigateDota } from './investigate.js';
 import { logInteraction } from './logger.js';
+import { playSound } from './soundboard.js';
 
 const COMMANDS_INFO = [
     { name: '/topheroes', description: 'Show the top Dota 2 heroes by role (win rate)' },
@@ -16,6 +24,7 @@ const COMMANDS_INFO = [
     { name: '/investigate', description: 'Deep research a complex Dota 2 question (AI-powered)' },
     { name: '/movies', description: 'Get 5 random top movie recommendations (now playing)' },
     { name: '/coinflip', description: 'Flip a coin (Heads or Tails)' },
+    { name: '/soundboard', description: 'Play a custom sound effect in your voice channel' },
     { name: '/help', description: 'Show all available commands' },
 ];
 
@@ -27,7 +36,7 @@ if (!token) {
 }
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
 });
 
 client.once(Events.ClientReady, (c) => {
@@ -51,7 +60,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const startTime = Date.now();
     let tokens = 0;
-    let cost = 0;
     let status = 200;
 
     try {
@@ -126,7 +134,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 await interaction.deferReply();
                 const result = await askDota(question);
                 tokens = result.tokens || 0;
-                cost = result.cost || 0;
 
                 const embed = new EmbedBuilder()
                     .setTitle('🤖 Dota 2 AI')
@@ -151,7 +158,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 await interaction.deferReply();
                 const result = await investigateDota(question);
                 tokens = result.tokens || 0;
-                cost = result.cost || 0;
 
                 const embed = new EmbedBuilder()
                     .setTitle('🔍 Dota 2 AI Research')
@@ -182,13 +188,46 @@ client.on(Events.InteractionCreate, async (interaction) => {
             return;
         }
 
+        if (interaction.commandName === 'soundboard') {
+            const soundName = interaction.options.getString('sound');
+            try {
+                const voiceChannel = interaction.member?.voice?.channel;
+                if (!voiceChannel) {
+                    await interaction.reply({ content: '❌ You must be in a voice channel to use this command.', ephemeral: true });
+                    return;
+                }
+
+                await interaction.deferReply();
+                await playSound(voiceChannel, soundName);
+                await interaction.editReply({ content: `🔊 Playing **${soundName}** in ${voiceChannel.name}!` });
+            } catch (error) {
+                console.error('Error handling /soundboard:', error);
+                status = 500;
+                const content = `❌ ${error.message || 'Failed to play sound. Please try again later.'}`;
+                if (interaction.deferred || interaction.replied) await interaction.editReply({ content }).catch(console.error);
+                else await interaction.reply({ content, ephemeral: true }).catch(console.error);
+            }
+            return;
+        }
+
         if (interaction.commandName === 'help') {
             try {
                 const list = COMMANDS_INFO.map(c => `**${c.name}** — ${c.description}`).join('\n');
+
+                const soundsPath = join(__dirname, '..', 'sounds');
+                const soundFiles = readdirSync(soundsPath)
+                    .filter(file => file.endsWith('.mp3'))
+                    .map(file => file.replace('.mp3', ''));
+
+                const soundsList = soundFiles.length > 0
+                    ? soundFiles.map(s => `\`${s}\``).join(', ')
+                    : 'No sounds available.';
+
                 const embed = new EmbedBuilder()
                     .setTitle('Available Commands')
-                    .setDescription(list)
+                    .setDescription(list + `\n\n**🔊 Available Sounds:**\n${soundsList}`)
                     .setColor(0x2196F3);
+
                 await interaction.reply({ embeds: [embed] });
             } catch (error) {
                 console.error('Error handling /help:', error);
@@ -198,7 +237,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
 
     } finally {
-        logInteraction(interaction, Date.now() - startTime, status, tokens, cost);
+        logInteraction(interaction, Date.now() - startTime, status, tokens);
     }
 });
 

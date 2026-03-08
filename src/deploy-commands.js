@@ -75,6 +75,16 @@ const commands = [
                 .setRequired(true)
         )
         .toJSON(),
+    new SlashCommandBuilder()
+        .setName('soundboard')
+        .setDescription('Play a custom sound effect in your voice channel')
+        .addStringOption(option =>
+            option
+                .setName('sound')
+                .setDescription('Name of the sound (must match a file in the sounds/ folder, e.g. "wow")')
+                .setRequired(true)
+        )
+        .toJSON(),
 ];
 
 const rest = new REST({ version: '10' }).setToken(token);

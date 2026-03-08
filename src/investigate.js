@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import { calculateCost } from './logger.js';
 
 const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -34,15 +33,13 @@ export async function investigateDota(question) {
 
         return {
             answer: response.output_text,
-            tokens: inputTokens + outputTokens,
-            cost: calculateCost('gpt-4o', inputTokens, outputTokens)
+            tokens: inputTokens + outputTokens
         };
     } catch (error) {
         console.error("AI Investigation failed:", error);
         return {
             answer: "I encountered an error while researching this topic. Try simplifying your query or asking a different question.",
-            tokens: 0,
-            cost: 0
+            tokens: 0
         };
     }
 }

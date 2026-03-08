@@ -16,6 +16,7 @@ A Dota 2 companion for Discord! This bot provides real-time stats on the **top D
 | `/investigate question:`       | Deep research a complex Dota 2 question using recent web data |
 | `/movies`                      | Get 5 random top movie recommendations (now playing) |
 | `/coinflip`                    | Flip a coin (Heads or Tails)                     |
+| `/soundboard sound:`           | Play a custom sound effect in your voice channel |
 | `/help`                        | Show all available commands                       |
 
 ---
@@ -116,7 +117,8 @@ discord-dota/
 │   ├── api.js              # OpenDota API helper
 │   ├── ask.js              # GPT-4o-mini powered Q&A system
 │   ├── logger.js           # Morgan-based logging for bot interactions
-│   └── investigate.js      # Deep research a complex Dota 2 question using recent web data
+│   ├── investigate.js      # Deep research a complex Dota 2 question using recent web data
+│   └── soundboard.js       # Play MP3 files from the sounds directory in voice channels
 ├── .env                    # Your secrets (not committed)
 ├── .env.example            # Template for .env
 └── package.json
