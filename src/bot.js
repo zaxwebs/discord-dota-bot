@@ -16,6 +16,7 @@ import { askDota } from './ask.js';
 import { investigateDota } from './investigate.js';
 import { logInteraction } from './logger.js';
 import { playSound } from './soundboard.js';
+import { startServer } from './server.js';
 
 const COMMANDS_INFO = [
     { name: '/topheroes', description: 'Show the top Dota 2 heroes by role (win rate)' },
@@ -43,6 +44,7 @@ client.once(Events.ClientReady, (c) => {
     console.log(`Logged in as ${c.user.tag}`);
     console.log(`Serving ${c.guilds.cache.size} server(s)`);
     c.guilds.cache.forEach(g => console.log(`  → Guild: ${g.name} (ID: ${g.id})`));
+    startServer(client);
 });
 
 // Prevent silent crashes

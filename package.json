@@ -15,6 +15,7 @@
     "discord.js": "^14.16.3",
     "dotaconstants": "^10.7.0",
     "dotenv": "^16.4.7",
+    "express": "^5.2.1",
     "libsodium-wrappers": "^0.8.2",
     "morgan": "^1.10.1",
     "openai": "^6.25.0",
