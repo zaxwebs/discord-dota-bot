@@ -12,6 +12,7 @@
     "@discordjs/opus": "^0.10.0",
     "@discordjs/voice": "^0.19.0",
     "@snazzah/davey": "^0.1.10",
+    "cors": "^2.8.6",
     "discord.js": "^14.16.3",
     "dotaconstants": "^10.7.0",
     "dotenv": "^16.4.7",

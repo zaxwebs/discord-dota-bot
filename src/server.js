@@ -1,6 +1,7 @@
 // Express API server for soundboard control
 import express from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
 import { readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -18,6 +19,7 @@ export function startServer(client) {
     const app = express();
     const port = process.env.API_PORT || 7330;
 
+    app.use(cors());
     app.use(morgan('dev'));
     app.use(express.json());
 
