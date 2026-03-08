@@ -16,7 +16,7 @@ const SOUNDS_DIR = join(__dirname, '..', 'sounds');
  */
 export function startServer(client) {
     const app = express();
-    const port = process.env.API_PORT || 3000;
+    const port = process.env.API_PORT || 7330;
 
     app.use(morgan('dev'));
     app.use(express.json());
