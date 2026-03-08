@@ -70,6 +70,7 @@ CLIENT_ID=paste_your_application_id_here
 
 TMDB_API_KEY=paste_your_tmdb_api_key_here
 OPENAI_API_KEY=paste_your_openai_api_key_here
+API_PORT=3000
 ```
 
 | Variable         | What It Is                                         | Where to Find It                                                              |
@@ -78,6 +79,7 @@ OPENAI_API_KEY=paste_your_openai_api_key_here
 | `CLIENT_ID`      | The unique ID of your Discord application (bot)     | [Developer Portal](https://discord.com/developers/applications) → General Information → Application ID |
 | `TMDB_API_KEY`   | API key for movie recommendations                  | [TMDB Settings](https://www.themoviedb.org/settings/api) → Request an API Key (free) |
 | `OPENAI_API_KEY` | API key for AI-powered `/ask` feature              | [OpenAI](https://platform.openai.com/api-keys) → Create new secret key |
+| `API_PORT`       | Port for the HTTP API server (default: `3000`)     | Optional — set if port 3000 is in use |
 
 
 
@@ -100,6 +102,47 @@ You should see:
 ```
 Logged in as YourBot#1234
 Serving 1 server(s)
+🌐 API server listening on port 3000
+```
+
+---
+
+## HTTP API
+
+The bot also exposes a local HTTP API for programmatic soundboard control.
+
+### `GET /api/soundboard/list`
+
+Returns all available sound names.
+
+```json
+{ "sounds": ["outro", "passed", "run", "wow"] }
+```
+
+### `POST /api/soundboard/play`
+
+Plays a sound in a Discord voice channel.
+
+**Request body:**
+
+```json
+{ "channelId": "YOUR_CHANNEL_ID", "sound": "outro" }
+```
+
+**Response:**
+
+```json
+{ "success": true, "message": "Playing \"outro\" in #Dota 2" }
+```
+
+**Example (PowerShell):**
+
+```powershell
+# List sounds
+Invoke-RestMethod http://localhost:3000/api/soundboard/list
+
+# Play a sound
+Invoke-RestMethod -Uri http://localhost:3000/api/soundboard/play -Method POST -ContentType "application/json" -Body '{"channelId": "YOUR_CHANNEL_ID", "sound": "wow"}'
 ```
 
 ---
@@ -110,6 +153,7 @@ Serving 1 server(s)
 discord-dota/
 ├── src/
 │   ├── bot.js              # Main bot entrypoint
+│   ├── server.js           # Express HTTP API for soundboard control
 │   ├── deploy-commands.js  # Registers slash commands with Discord
 │   ├── heroes.js           # Fetches & filters hero data
 │   ├── movies.js           # TMDB API for movie recommendations
@@ -119,6 +163,7 @@ discord-dota/
 │   ├── logger.js           # Morgan-based logging for bot interactions
 │   ├── investigate.js      # Deep research a complex Dota 2 question using recent web data
 │   └── soundboard.js       # Play MP3 files from the sounds directory in voice channels
+├── sounds/                 # MP3 files for the soundboard
 ├── .env                    # Your secrets (not committed)
 ├── .env.example            # Template for .env
 └── package.json
