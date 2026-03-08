@@ -1,4 +1,4 @@
-# 🛡️ Dota 2 AI Discord Bot
+# Dota 2 AI Discord Bot
 
 A Dota 2 companion for Discord! This bot provides real-time stats on the **top Dota 2 heroes by role** and features an **AI-powered Q&A engine** to analyze matches, meta trends, and deep-dive into complex game mechanics.
 
